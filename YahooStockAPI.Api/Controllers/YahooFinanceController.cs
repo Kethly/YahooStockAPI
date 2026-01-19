@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using YahooStockAPI.Api.Services;
 using YahooStockAPI.Models;
 
 namespace YahooStockAPI.Api.Controllers;
@@ -8,10 +9,11 @@ namespace YahooStockAPI.Api.Controllers;
 public class YahooFinanceController : ControllerBase
 {
     private readonly ILogger<YahooFinanceController> _logger;
-
-    public YahooFinanceController(ILogger<YahooFinanceController> logger)
+    private readonly IYahooFinanceService _service;
+    public YahooFinanceController(ILogger<YahooFinanceController> logger, IYahooFinanceService service)
     {
         _logger = logger;
+        _service = service;
     }
 
     // Gets the intraday information based off of String symbol, validates the symbol
@@ -25,6 +27,7 @@ public class YahooFinanceController : ControllerBase
         {
             return BadRequest("Symbol is required");
         }
+        intradayList = await _service.GetIntradayList(symbol);
         return Ok(intradayList);
     }
 }

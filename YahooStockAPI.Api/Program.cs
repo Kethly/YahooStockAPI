@@ -1,10 +1,12 @@
+using YahooStockAPI.Api.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddHttpClient<YahooStockAPI.Api.Services.YahooFinanceService>();
+builder.Services.AddHttpClient<IYahooFinanceService, YahooFinanceService>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
