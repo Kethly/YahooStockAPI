@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YahooStockAPI.Api", "YahooStockAPI.Api\YahooStockAPI.Api.csproj", "{5FB90A0A-80AA-4602-B5DF-55942E9BFF1C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YahooStockAPI.Tests", "YahooStockAPI.Tests\YahooStockAPI.Tests.csproj", "{C233C497-761B-4DCB-95F6-2E5FE51472E2}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5FB90A0A-80AA-4602-B5DF-55942E9BFF1C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5FB90A0A-80AA-4602-B5DF-55942E9BFF1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5FB90A0A-80AA-4602-B5DF-55942E9BFF1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5FB90A0A-80AA-4602-B5DF-55942E9BFF1C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C233C497-761B-4DCB-95F6-2E5FE51472E2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C233C497-761B-4DCB-95F6-2E5FE51472E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C233C497-761B-4DCB-95F6-2E5FE51472E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C233C497-761B-4DCB-95F6-2E5FE51472E2}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
