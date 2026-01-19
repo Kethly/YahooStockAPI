@@ -1,3 +1,8 @@
+/* YahooFinanceService
+   Responsible for querying Yahoo Finance chart API and transforming the raw intraday data
+   into daily statistics (low average, high average, total volume). This is using 1 month
+   range with 15 minute intervals as a point of reference.
+   Additionally, handles parsing and grouping logic for the dates */
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using YahooStockAPI.Api.Helpers;

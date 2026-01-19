@@ -1,3 +1,7 @@
+/* YahooFinanceHelper
+   Provides reusable, static utility functions for date conversion, rounding,
+   and statistical calculations used by the service layer. Intended to
+   to be scalable for other endpoints and classes */
 namespace YahooStockAPI.Api.Helpers;
 
 public class YahooFinanceHelper
