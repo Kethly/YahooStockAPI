@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "E7GVeX3trZ5Zr+ZeEqEciF+S0UowHiLyG19mX1Sq2Ac=",
+  "Source": "YahooStockAPI.Api",
+  "BasePath": "_content/YahooStockAPI.Api",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

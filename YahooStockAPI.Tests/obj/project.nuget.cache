@@ -1,13 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "met5UimqcBA=",
+  "dgSpecHash": "y03JeA4Qt0U=",
   "success": true,
   "projectFilePath": "/Users/kethly/Workspace/YahooStockAPI/YahooStockAPI.Tests/YahooStockAPI.Tests.csproj",
   "expectedPackageFiles": [
     "/Users/kethly/.nuget/packages/castle.core/5.1.1/castle.core.5.1.1.nupkg.sha512",
     "/Users/kethly/.nuget/packages/coverlet.collector/6.0.0/coverlet.collector.6.0.0.nupkg.sha512",
     "/Users/kethly/.nuget/packages/fluentassertions/8.8.0/fluentassertions.8.8.0.nupkg.sha512",
-    "/Users/kethly/.nuget/packages/microsoft.aspnetcore.openapi/8.0.23/microsoft.aspnetcore.openapi.8.0.23.nupkg.sha512",
     "/Users/kethly/.nuget/packages/microsoft.codecoverage/18.0.1/microsoft.codecoverage.18.0.1.nupkg.sha512",
     "/Users/kethly/.nuget/packages/microsoft.extensions.apidescription.server/6.0.5/microsoft.extensions.apidescription.server.6.0.5.nupkg.sha512",
     "/Users/kethly/.nuget/packages/microsoft.net.test.sdk/18.0.1/microsoft.net.test.sdk.18.0.1.nupkg.sha512",
