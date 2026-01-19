@@ -49,7 +49,8 @@ public class YahooFinanceController : ControllerBase
         // Possible for stock exchanges like NASDAQ
         if (!intradayList.Any())
         {
-            return NotFound("No intraday data found for this symbol.");
+            _logger.LogError("No intraday data found for symbol: {Symbol}", symbol);
+            return NotFound("No intraday data found for this symbol: " + symbol);
         }
         
         return Ok(intradayList);

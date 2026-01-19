@@ -60,6 +60,7 @@ public class YahooFinanceService : IYahooFinanceService
 
         if(!rawData.GetProperty("chart").GetProperty("result")[0].TryGetProperty("timestamp", out _))
         {
+            _logger.LogWarning("Intraday data not found in the response");
             return parsedData;
         }
         var timestamps = rawData.GetProperty("chart").GetProperty("result")[0].GetProperty("timestamp");
@@ -83,7 +84,7 @@ public class YahooFinanceService : IYahooFinanceService
             {
                 _logger.LogWarning("Skipping null datapoint at index {Index}", i);
                 continue;
-    }
+            }
             double low = lows[i].GetDouble();
             double high = highs[i].GetDouble();
             long volume = volumes[i].GetInt64();
@@ -110,12 +111,12 @@ public class YahooFinanceService : IYahooFinanceService
         List<Intraday> intradayList = new List<Intraday>();
 
         // Iterate through the dictionary and convert it to a list of Intraday DTOs
-        foreach(var value in parsedData)
+        foreach(var entry in parsedData)
         {
-            var day = value.Key;
-            var lowAverage = YahooFinanceHelper.RoundToFourDecimalPlaces(YahooFinanceHelper.CalculateAverage(value.Value.Lows!));
-            var highAverage = YahooFinanceHelper.RoundToFourDecimalPlaces(YahooFinanceHelper.CalculateAverage(value.Value.Highs!));
-            var volume = value.Value.Volumes!.Sum();
+            var day = entry.Key;
+            var lowAverage = YahooFinanceHelper.RoundToFourDecimalPlaces(YahooFinanceHelper.CalculateAverage(entry.Value.Lows!));
+            var highAverage = YahooFinanceHelper.RoundToFourDecimalPlaces(YahooFinanceHelper.CalculateAverage(entry.Value.Highs!));
+            var volume = entry.Value.Volumes!.Sum();
             intradayList.Add(new Intraday{
                 Day = day,
                 LowAverage = lowAverage,
@@ -134,6 +135,7 @@ public class YahooFinanceService : IYahooFinanceService
         // If symbol somehow ends up being empty here, throw exception
         if(string.IsNullOrWhiteSpace(symbol))
         {
+            _logger.LogError("Symbol is required but was empty.");
             throw new Exception("Symbol is required");
         }
         // default rage of 1 month and interval of 15 minutes
