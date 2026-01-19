@@ -21,7 +21,7 @@ API endpoint that consumes yahoo finance stock information and outputs json that
 4. Inside the top layer of the .NET application: run ```dotnet dev-certs https --trust``` to trust the certificate
 5. Then run ```dotnet run --launch-profile https``` to launch the application
 6. For tests run ```dotnet test```
-7. The endpoint is ```GET /api/yahoo/intraday/{symbol}```
+7. The endpoint is ```GET /api/yahoofinance/intraday/{symbol}```
 
 ## Project Structure
 * YahooStockAPI.Api/Controllers: API endpoints + HTTP status handling
