@@ -5,6 +5,7 @@
 
 **/bin/
 **/obj/
+**/Debug/
 .vs/
 
 # dotenv files
