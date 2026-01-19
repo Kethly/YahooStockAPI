@@ -38,7 +38,6 @@ public class YahooFinanceService : IYahooFinanceService
     // time range and set interval
     // Returns the raw JSON data and checks for errors
     private async Task<JsonElement> queryYahooFinanceAsync(String symbol, String range, String interval) {
-        // TODO implement Yahoo Finance API
         // if error, then return a response, log it, and then throw an exception
         _logger.LogInformation("Url: {baseUrl}/v8/finance/chart/{symbol}?range={range}&interval={interval}", baseUrl, symbol, range, interval);
         var response = await _httpClient.GetAsync($"{baseUrl}/v8/finance/chart/{symbol}?range={range}&interval={interval}");
@@ -56,10 +55,9 @@ public class YahooFinanceService : IYahooFinanceService
         return doc.RootElement;
     }
 
-    // Creates dictionary for simple calculations
+    // Creates dictionary of data mapped to a day for simple calculations
     private Dictionary<String, RawDayData> parseRawData(JsonElement rawData)
     {
-        // TODO implement parsing logic
         var parsedData = new Dictionary<DateTime, RawDayData>();
         var highs = rawData.GetProperty("chart").GetProperty("result")[0].GetProperty("indicators").GetProperty("quote")[0].GetProperty("high");
         var lows = rawData.GetProperty("chart").GetProperty("result")[0].GetProperty("indicators").GetProperty("quote")[0].GetProperty("low");
@@ -74,35 +72,35 @@ public class YahooFinanceService : IYahooFinanceService
         Dictionary<String, RawDayData> rawDayDictionary = new Dictionary<String, RawDayData>();
         for(int i = 0; i < days.Count; i++)
         {
-            // populate RawDayData lists for cal
-            //TODO: remove the try and manually catch the nulls to make logging more accurate
-            try
+            // populate RawDayData lists for calculations
+            // Skip empty or null datapoints and don't create unnecessary days
+            if (lows[i].ValueKind == JsonValueKind.Null ||
+                highs[i].ValueKind == JsonValueKind.Null ||
+                volumes[i].ValueKind == JsonValueKind.Null)
             {
-                double low = lows[i].GetDouble();
-                double high = highs[i].GetDouble();
-                long volume = volumes[i].GetInt64();
-                if(!rawDayDictionary.ContainsKey(days[i]))
-                rawDayDictionary.Add(days[i], new RawDayData{
-                    Lows = new List<double>(),
-                    Highs = new List<double>(),
-                    Volumes = new List<long>()
-                });
-                rawDayDictionary[days[i]].Lows!.Add(low);
-                rawDayDictionary[days[i]].Highs!.Add(high);
-                rawDayDictionary[days[i]].Volumes!.Add(volume);
-            } catch(Exception)
-            {
-                _logger.LogWarning("Skipping data point at index {Index} due to missing data.", i);
-            }
+                _logger.LogWarning("Skipping null datapoint at index {Index}", i);
+                continue;
+    }
+            double low = lows[i].GetDouble();
+            double high = highs[i].GetDouble();
+            long volume = volumes[i].GetInt64();
+            if(!rawDayDictionary.ContainsKey(days[i]))
+            rawDayDictionary.Add(days[i], new RawDayData{
+                Lows = new List<double>(),
+                Highs = new List<double>(),
+                Volumes = new List<long>()
+            });
+            rawDayDictionary[days[i]].Lows!.Add(low);
+            rawDayDictionary[days[i]].Highs!.Add(high);
+            rawDayDictionary[days[i]].Volumes!.Add(volume);
             
         }
         return rawDayDictionary;
     }
 
-    // Returns the final output of a list of Intradays
+    // Returns the final output of a list of Intraday DTOs
     private List<Intraday> calculateAndFormatIntradays(Dictionary<String, RawDayData> parsedData)
     {
-        // TODO implement calculations and return list of Intradays
         // Convert the DateTime objects to appropriate format YYYY-MM-DD
         List<Intraday> intradayList = new List<Intraday>();
         foreach(var value in parsedData)
@@ -124,8 +122,8 @@ public class YahooFinanceService : IYahooFinanceService
     // Runs the whole api endpoint logic
     // Returns list of Intradays for given symbol
     public async Task<IEnumerable<Intraday>> GetIntradayList(String symbol) {
-        // TODO implement controller logic
         // Allows exceptions to pass and the controller to handle them
+        // default rage of 1 month and interval of 15 minutes
         var rawData = await queryYahooFinanceAsync(symbol, "1mo", "15m");
         var parsedData = parseRawData(rawData);
         var intradayList = calculateAndFormatIntradays(parsedData);

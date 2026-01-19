@@ -3,7 +3,8 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
-using YahooStockAPI.Api.Controllers; 
+using YahooStockAPI.Api.Controllers;
+using YahooStockAPI.Api.Services;
 using YahooStockAPI.Models;
 
 public class YahooFinanceControllerTests
@@ -14,13 +15,13 @@ public class YahooFinanceControllerTests
     public async Task getSymbolEmpty()
     {
         var logger = new Mock<ILogger<YahooFinanceController>>();
-        var controller = new YahooFinanceController(logger.Object);
+        var controller = new YahooFinanceController(logger.Object, Mock.Of<YahooFinanceService>());
 
-        var result = controller.GetIntradayList("   ");
-        result.Result.Result.Should().BeOfType<BadRequestObjectResult>();
+        var result = await controller.GetIntradayList("   ");
+        result.Result.Should().BeOfType<BadRequestObjectResult>();
 
-        result = controller.GetIntradayList("");
-        result.Result.Result.Should().BeOfType<BadRequestObjectResult>();
+        result = await controller.GetIntradayList("");
+        result.Result.Should().BeOfType<BadRequestObjectResult>();
     }
 
     // Test input: tesla sticker
@@ -29,9 +30,9 @@ public class YahooFinanceControllerTests
     public async Task getSymbolSuccessful()
     {
         var logger = new Mock<ILogger<YahooFinanceController>>();
-        var controller = new YahooFinanceController(logger.Object);
+        var controller = new YahooFinanceController(logger.Object, Mock.Of<YahooFinanceService>());
 
-        var result = controller.GetIntradayList("TSLA");
+        var result = await controller.GetIntradayList("TSLA");
 
         result.Result.Should().BeOfType<OkObjectResult>();
     }
