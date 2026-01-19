@@ -1,0 +1,2 @@
+namespace YahooStockAPI.Api.Helpers;
+
