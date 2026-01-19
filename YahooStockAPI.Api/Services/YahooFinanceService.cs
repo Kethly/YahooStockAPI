@@ -39,7 +39,6 @@ public class YahooFinanceService : IYahooFinanceService
     // Returns the raw JSON data and checks for errors
     private async Task<JsonElement> queryYahooFinanceAsync(String symbol, String range, String interval) {
         // if error, then return a response, log it, and then throw an exception
-        _logger.LogInformation("Url: {baseUrl}/v8/finance/chart/{symbol}?range={range}&interval={interval}", baseUrl, symbol, range, interval);
         var response = await _httpClient.GetAsync($"{baseUrl}/v8/finance/chart/{symbol}?range={range}&interval={interval}");
         _logger.LogInformation("Response status code: {StatusCode}", response.StatusCode);
         
@@ -51,25 +50,29 @@ public class YahooFinanceService : IYahooFinanceService
 
         var json = await response.Content.ReadAsStringAsync();
         var doc = JsonDocument.Parse(json);
-        //_logger.LogInformation("raw data: {Json}", json);
         return doc.RootElement;
     }
 
     // Creates dictionary of data mapped to a day for simple calculations
     private Dictionary<String, RawDayData> parseRawData(JsonElement rawData)
     {
-        var parsedData = new Dictionary<DateTime, RawDayData>();
+        Dictionary<String, RawDayData> parsedData = new Dictionary<String, RawDayData>();
+
+        if(!rawData.GetProperty("chart").GetProperty("result")[0].TryGetProperty("timestamp", out _))
+        {
+            return parsedData;
+        }
+        var timestamps = rawData.GetProperty("chart").GetProperty("result")[0].GetProperty("timestamp");
         var highs = rawData.GetProperty("chart").GetProperty("result")[0].GetProperty("indicators").GetProperty("quote")[0].GetProperty("high");
         var lows = rawData.GetProperty("chart").GetProperty("result")[0].GetProperty("indicators").GetProperty("quote")[0].GetProperty("low");
         var volumes = rawData.GetProperty("chart").GetProperty("result")[0].GetProperty("indicators").GetProperty("quote")[0].GetProperty("volume");
-        var timestamps = rawData.GetProperty("chart").GetProperty("result")[0].GetProperty("timestamp");
+        
         List<String> days = new List<String>();
         foreach(var timestamp in timestamps.EnumerateArray())
         {
             // Convert each one into a key that makes it easier to group by day
             days.Add(YahooFinanceHelper.ConvertDateTimeToString(YahooFinanceHelper.ConvertToDateTime(timestamp.GetInt64()).Date));
         }
-        Dictionary<String, RawDayData> rawDayDictionary = new Dictionary<String, RawDayData>();
         for(int i = 0; i < days.Count; i++)
         {
             // populate RawDayData lists for calculations
@@ -84,18 +87,20 @@ public class YahooFinanceService : IYahooFinanceService
             double low = lows[i].GetDouble();
             double high = highs[i].GetDouble();
             long volume = volumes[i].GetInt64();
-            if(!rawDayDictionary.ContainsKey(days[i]))
-            rawDayDictionary.Add(days[i], new RawDayData{
+
+            // Only create new day entry if it already doesn't exist
+            if(!parsedData.ContainsKey(days[i]))
+            parsedData.Add(days[i], new RawDayData{
                 Lows = new List<double>(),
                 Highs = new List<double>(),
                 Volumes = new List<long>()
             });
-            rawDayDictionary[days[i]].Lows!.Add(low);
-            rawDayDictionary[days[i]].Highs!.Add(high);
-            rawDayDictionary[days[i]].Volumes!.Add(volume);
+            parsedData[days[i]].Lows!.Add(low);
+            parsedData[days[i]].Highs!.Add(high);
+            parsedData[days[i]].Volumes!.Add(volume);
             
         }
-        return rawDayDictionary;
+        return parsedData;
     }
 
     // Returns the final output of a list of Intraday DTOs
@@ -103,6 +108,8 @@ public class YahooFinanceService : IYahooFinanceService
     {
         // Convert the DateTime objects to appropriate format YYYY-MM-DD
         List<Intraday> intradayList = new List<Intraday>();
+
+        // Iterate through the dictionary and convert it to a list of Intraday DTOs
         foreach(var value in parsedData)
         {
             var day = value.Key;
@@ -123,6 +130,12 @@ public class YahooFinanceService : IYahooFinanceService
     // Returns list of Intradays for given symbol
     public async Task<IEnumerable<Intraday>> GetIntradayList(String symbol) {
         // Allows exceptions to pass and the controller to handle them
+
+        // If symbol somehow ends up being empty here, throw exception
+        if(string.IsNullOrWhiteSpace(symbol))
+        {
+            throw new Exception("Symbol is required");
+        }
         // default rage of 1 month and interval of 15 minutes
         var rawData = await queryYahooFinanceAsync(symbol, "1mo", "15m");
         var parsedData = parseRawData(rawData);

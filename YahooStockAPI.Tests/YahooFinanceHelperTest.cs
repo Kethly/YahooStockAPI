@@ -7,7 +7,7 @@ public class YahooFinanceHelperTests
     // Test input: unix time
     // Expected output: proper date and formatted string
     [Fact]
-    public void testDateConversion()
+    public void TestDateConversion()
     {
 
         var result = YahooFinanceHelper.ConvertToDateTime(1765981800);
@@ -20,7 +20,7 @@ public class YahooFinanceHelperTests
     // Test input: long decimal value
     // Expected output: rounded to four positions.
     [Fact]
-    public void testRounding()
+    public void TestRounding()
     {
         var helper = new YahooFinanceHelper();
         var result = YahooFinanceHelper.RoundToFourDecimalPlaces(123.456789);
@@ -30,7 +30,7 @@ public class YahooFinanceHelperTests
     // Test input: list of doubles
     // Expected output: average of the list
     [Fact]
-    public void testAverageCalculation()
+    public void TestAverageCalculation()
     {
         var values = new List<double> { 1.0, 2.0, 3.0, 4.0 };
         var result = YahooFinanceHelper.CalculateAverage(values);

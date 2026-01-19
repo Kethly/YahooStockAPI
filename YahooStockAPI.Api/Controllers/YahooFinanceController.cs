@@ -18,16 +18,40 @@ public class YahooFinanceController : ControllerBase
 
     // Gets the intraday information based off of String symbol, validates the symbol
     // and then returns a list of daily values from the past month
-    // TODO: create a service and helper that returns the list of intradays
     [HttpGet("intraday/{symbol}")]
     public async Task<ActionResult<IEnumerable<Intraday>>> GetIntradayList(String symbol)
     {
         IEnumerable<Intraday> intradayList = new List<Intraday>();
+        // Classic 400 response because the user put a bad value
+        // Not doing any symbol check here, only whitespace
+        // Allowing yahoo finance api to handle invalid symbols
         if(string.IsNullOrWhiteSpace(symbol))
         {
             return BadRequest("Symbol is required");
         }
-        intradayList = await _service.GetIntradayList(symbol);
+        try{
+            intradayList = await _service.GetIntradayList(symbol);
+        } catch (HttpRequestException httpEx)
+        {
+            // Because we have a problem with the yahoo api it is 502 bad gateway
+            _logger.LogError(httpEx, "HTTP request error while getting intraday list for symbol: {Symbol}", symbol);
+            return StatusCode(502, "Invalid symbol or Yahoo API error");
+        }
+        catch (Exception ex)
+        {
+            // By default, anything unexpected is internal server
+            _logger.LogError(ex, "Unexpected error while getting intraday list for symbol: {Symbol}", symbol);
+            return StatusCode(500, "Internal server error");
+        }
+        
+        // 404 Scenario if symbol exists, yahoo searches and returns success
+        // but no intraday data found
+        // Possible for stock exchanges like NASDAQ
+        if (!intradayList.Any())
+        {
+            return NotFound("No intraday data found for this symbol.");
+        }
+        
         return Ok(intradayList);
     }
 }
