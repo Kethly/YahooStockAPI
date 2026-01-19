@@ -18,7 +18,7 @@ public class YahooFinanceController : ControllerBase
     // and then returns a list of daily values from the past month
     // TODO: create a service and helper that returns the list of intradays
     [HttpGet("intraday/{symbol}")]
-    public ActionResult<IEnumerable<Intraday>> GetIntradayList(String symbol)
+    public async Task<ActionResult<IEnumerable<Intraday>>> GetIntradayList(String symbol)
     {
         IEnumerable<Intraday> intradayList = new List<Intraday>();
         if(string.IsNullOrWhiteSpace(symbol))

@@ -11,22 +11,22 @@ public class YahooFinanceControllerTests
     // Test input: empty or whitespace request
     // Expected output: bad request status
     [Fact]
-    public void GetSymbolEmpty()
+    public async Task getSymbolEmpty()
     {
         var logger = new Mock<ILogger<YahooFinanceController>>();
         var controller = new YahooFinanceController(logger.Object);
 
         var result = controller.GetIntradayList("   ");
-        result.Result.Should().BeOfType<BadRequestObjectResult>();
+        result.Result.Result.Should().BeOfType<BadRequestObjectResult>();
 
         result = controller.GetIntradayList("");
-        result.Result.Should().BeOfType<BadRequestObjectResult>();
+        result.Result.Result.Should().BeOfType<BadRequestObjectResult>();
     }
 
     // Test input: tesla sticker
     // Expected output: 200 or ok response
     [Fact]
-    public void Get_ReturnsOk_WhenSymbolProvided()
+    public async Task getSymbolSuccessful()
     {
         var logger = new Mock<ILogger<YahooFinanceController>>();
         var controller = new YahooFinanceController(logger.Object);

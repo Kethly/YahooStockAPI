@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("YahooStockAPI.Tests")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7590aec82f2aa746f06dd2ea663695a0c9b37e51")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c22b0b405e99e13a919cd378bedcb8bb2efb49d3")]
 [assembly: System.Reflection.AssemblyProductAttribute("YahooStockAPI.Tests")]
 [assembly: System.Reflection.AssemblyTitleAttribute("YahooStockAPI.Tests")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
