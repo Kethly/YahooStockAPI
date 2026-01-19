@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
+using YahooStockAPI.Api.Helpers;
 using YahooStockAPI.Models;
 
 namespace YahooStockAPI.Api.Services;
@@ -16,7 +17,7 @@ public class RawDayData
 {
     public List<double>? Lows { get; set; }
     public List<double>? Highs { get; set; }
-    public List<int>? Volumes { get; set; }
+    public List<long>? Volumes { get; set; }
 }
 
 public class YahooFinanceService : IYahooFinanceService
@@ -51,32 +52,73 @@ public class YahooFinanceService : IYahooFinanceService
 
         var json = await response.Content.ReadAsStringAsync();
         var doc = JsonDocument.Parse(json);
-        _logger.LogInformation("raw data: {Json}", json);
+        //_logger.LogInformation("raw data: {Json}", json);
         return doc.RootElement;
     }
 
     // Creates dictionary for simple calculations
-    private Dictionary<DateTime, RawDayData> parseRawData(JsonElement rawData)
+    private Dictionary<String, RawDayData> parseRawData(JsonElement rawData)
     {
         // TODO implement parsing logic
         var parsedData = new Dictionary<DateTime, RawDayData>();
-        //var highs = rawData.GetProperty("chart").GetProperty("result")[0].GetProperty("indicators").GetProperty("quote")[0].GetProperty("high");
-        //var lows = rawData["chart"]["result"][0]["indicators"]["quote"][0]["low"];
-        //var volumes = rawData["chart"]["result"][0]["indicators"]["quote"][0]["volume"];
-        //var timestamps = rawData["chart"]["result"][0]["timestamp"];
-        foreach (var property in rawData.EnumerateObject())
+        var highs = rawData.GetProperty("chart").GetProperty("result")[0].GetProperty("indicators").GetProperty("quote")[0].GetProperty("high");
+        var lows = rawData.GetProperty("chart").GetProperty("result")[0].GetProperty("indicators").GetProperty("quote")[0].GetProperty("low");
+        var volumes = rawData.GetProperty("chart").GetProperty("result")[0].GetProperty("indicators").GetProperty("quote")[0].GetProperty("volume");
+        var timestamps = rawData.GetProperty("chart").GetProperty("result")[0].GetProperty("timestamp");
+        List<String> days = new List<String>();
+        foreach(var timestamp in timestamps.EnumerateArray())
         {
-            // populate RawDayData lists for calculations
+            // Convert each one into a key that makes it easier to group by day
+            days.Add(YahooFinanceHelper.ConvertDateTimeToString(YahooFinanceHelper.ConvertToDateTime(timestamp.GetInt64()).Date));
         }
-        return default;
+        Dictionary<String, RawDayData> rawDayDictionary = new Dictionary<String, RawDayData>();
+        for(int i = 0; i < days.Count; i++)
+        {
+            // populate RawDayData lists for cal
+            //TODO: remove the try and manually catch the nulls to make logging more accurate
+            try
+            {
+                double low = lows[i].GetDouble();
+                double high = highs[i].GetDouble();
+                long volume = volumes[i].GetInt64();
+                if(!rawDayDictionary.ContainsKey(days[i]))
+                rawDayDictionary.Add(days[i], new RawDayData{
+                    Lows = new List<double>(),
+                    Highs = new List<double>(),
+                    Volumes = new List<long>()
+                });
+                rawDayDictionary[days[i]].Lows!.Add(low);
+                rawDayDictionary[days[i]].Highs!.Add(high);
+                rawDayDictionary[days[i]].Volumes!.Add(volume);
+            } catch(Exception)
+            {
+                _logger.LogWarning("Skipping data point at index {Index} due to missing data.", i);
+            }
+            
+        }
+        return rawDayDictionary;
     }
 
     // Returns the final output of a list of Intradays
-    private List<Intraday> calculateAndFormatIntradays(Dictionary<DateTime, RawDayData> parsedData)
+    private List<Intraday> calculateAndFormatIntradays(Dictionary<String, RawDayData> parsedData)
     {
         // TODO implement calculations and return list of Intradays
         // Convert the DateTime objects to appropriate format YYYY-MM-DD
-        return default;
+        List<Intraday> intradayList = new List<Intraday>();
+        foreach(var value in parsedData)
+        {
+            var day = value.Key;
+            var lowAverage = YahooFinanceHelper.RoundToFourDecimalPlaces(YahooFinanceHelper.CalculateAverage(value.Value.Lows!));
+            var highAverage = YahooFinanceHelper.RoundToFourDecimalPlaces(YahooFinanceHelper.CalculateAverage(value.Value.Highs!));
+            var volume = value.Value.Volumes!.Sum();
+            intradayList.Add(new Intraday{
+                Day = day,
+                LowAverage = lowAverage,
+                HighAverage = highAverage,
+                Volume = volume
+            });
+        }
+        return intradayList;
     }
 
     // Runs the whole api endpoint logic
