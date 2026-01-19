@@ -147,6 +147,7 @@ public class YahooFinanceService : IYahooFinanceService
         var rawData = await queryYahooFinanceAsync(symbol, "1mo", "15m");
         var parsedData = parseRawData(rawData);
         var intradayList = calculateAndFormatIntradays(parsedData);
-        return intradayList;
+        //sort the list
+        return intradayList.OrderBy(x => x.Day).ToList();
     }
 }
