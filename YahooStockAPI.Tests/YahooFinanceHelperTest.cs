@@ -9,12 +9,11 @@ public class YahooFinanceHelperTests
     [Fact]
     public void testDateConversion()
     {
-        var helper = new YahooFinanceHelper();
 
-        var result = helper.convertToDateTime(1765981800);
+        var result = YahooFinanceHelper.ConvertToDateTime(1765981800);
         result.Should().Be(new DateTime(2025, 12, 17, 14, 30, 0));
-        
-        var dateString = helper.convertDateTimeToString(new DateTime(2025, 9, 17));
+
+        var dateString = YahooFinanceHelper.ConvertDateTimeToString(new DateTime(2025, 9, 17));
         dateString.Should().Be("2025-09-17");
     }
 
@@ -24,7 +23,7 @@ public class YahooFinanceHelperTests
     public void testRounding()
     {
         var helper = new YahooFinanceHelper();
-        var result = helper.roundToFourDecimalPlaces(123.456789);
+        var result = YahooFinanceHelper.RoundToFourDecimalPlaces(123.456789);
         result.Should().Be(123.4568);
     }
 
@@ -33,9 +32,8 @@ public class YahooFinanceHelperTests
     [Fact]
     public void testAverageCalculation()
     {
-        var helper = new YahooFinanceHelper();
         var values = new List<double> { 1.0, 2.0, 3.0, 4.0 };
-        var result = helper.calculateAverage(values);
+        var result = YahooFinanceHelper.CalculateAverage(values);
         result.Should().Be(2.5);
     }
 }
