@@ -1,3 +1,4 @@
+// The tests use the real Yahoo Finance API, but they can be converted to mock data
 namespace YahooStockAPI.Tests;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
